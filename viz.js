@@ -12,8 +12,6 @@ function draw(lines) {
   var scale = Math.min(xScale, yScale);
   ctx.translate(10, 10);
 
-  var i = 0;
-
   function parseLine(line) {
     var row = lines[i].split(',');
     var timeOffset = Number(row[0] || 0);
@@ -26,7 +24,10 @@ function draw(lines) {
 
   function drawBus(current, previous) {
     if (previous) {
-      //var duration = current.
+      var duration = current.timestamp - previous.timestamp;
+      var opacity = Math.max(1 - (duration - 10) / 30, .1);
+      ctx.globalAlpha = opacity;
+      ctx.strokeStyle = '#000000';
       ctx.beginPath();
       ctx.moveTo((previous.lon - min[0]) * scale, canvas.height - Mercator.lat2y(previous.lat - min[1]) * scale);
       ctx.lineTo((current.lon - min[0]) * scale, canvas.height - Mercator.lat2y(current.lat - min[1]) * scale);
@@ -36,9 +37,10 @@ function draw(lines) {
 
   var buses = {};
 
-  var first = parseLine(lines[0]);
-  var currentTimestamp = first.timeOffset;
-  var groupFirstIndex = 0;
+  var currentTimestamp = 0;
+  var groupFirstIndex = -1;
+
+  var i = 0;
 
   function advance() {
     while (i < lines.length) {
@@ -46,9 +48,10 @@ function draw(lines) {
       if (current.timeOffset != 0 && i != groupFirstIndex) {
         groupFirstIndex = i;
         setTimeout(advance, 1);
-        currentTimestamp += currentTimestamp.timeOffset;
+        currentTimestamp += current.timeOffset;
         return;
       }
+      current.timestamp = currentTimestamp;
       var previous = buses[current.vehicleId];
       drawBus(current, previous);
       buses[current.vehicleId] = current;
