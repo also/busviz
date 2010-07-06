@@ -1,0 +1,16 @@
+<html>
+<head>
+<script type="text/javascript" src="geo.js"></script>
+<script type="text/javascript" src="viz.js"></script>
+<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript">
+$.get('15th.csv', function(data) {
+  var lines = data.split('\n');
+  draw(lines);
+});
+</script>
+</head>
+<body>
+<canvas id="canvas" width="1024" height="768"></canvas>
+</body>
+</html>
