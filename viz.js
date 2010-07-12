@@ -19,7 +19,7 @@ var FADE_ALPHA = 0;
 // color of the bus trails. null for speed gradient
 var COLOR = null;
 
-var LINE_CAP = null;
+var LINE_CAP = 'butt';
 
 var CLOCK_COLOR = '#aaaaaa';
 
