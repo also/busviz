@@ -1,0 +1,142 @@
+body {
+    background: #111;
+    padding: 0;
+    margin: 0;
+}
+
+#desc {
+    margin: 30px auto;
+    width: 1280px;
+    color: #fff;
+}
+
+#video {
+  display: none;
+}
+
+#options {
+  padding: 20px;
+}
+
+a {
+    color: #fff;
+}
+
+h1 {
+    font-size: 50px;
+}
+
+h1, h2, h3 {
+    font-family: "League Gothic";
+    font-weight: normal;
+    color: #fff;
+}
+
+h2 {
+  font-size: 40px;
+  margin: 0 0 10px 0;
+  border-bottom: 1px solid #111;
+  padding-bottom: 10px;
+}
+
+h3 {
+    color: #aaa;
+    font-size: 25px;
+    margin-top: 0;
+}
+
+p {
+    font-family: "CMU Bright";
+    font-size: 12px;
+}
+
+#presets {
+    margin: 0;
+    width: 300px;
+    padding: 0;
+    list-style-type: none;
+}
+
+#presets li {
+    font-family: "League Gothic";
+    margin: 10px;
+    -webkit-border-radius: 15px;
+    background-color: #333;
+    color: #fff;
+    height: 30px;
+    line-height: 30px;
+    padding-left: 15px;
+}
+
+@font-face {
+    font-family: "League Gothic";
+    src: url("type/league_gothic.otf");
+}
+
+@font-face {
+    font-family: "CMU Bright";
+    src: url("type/cmunbmr.otf");
+}
+
+#wrapper {
+    margin: 30px auto;
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-perspective: 2000;
+}
+
+#viz {
+    position: absolute;
+    width: 1280px;
+    height: 720px;
+    border: 1px solid #333;
+    -webkit-transform-style: preserve-3d;
+    -webkit-transition-property: -webkit-transform;
+    -webkit-transition-duration: 0.5s;
+}
+
+#viz.flipped {
+    -webkit-transform: rotateX(180deg);
+}
+
+.side {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 720px;
+    -webkit-backface-visibility: hidden;
+    background-color: black;
+}
+
+.front {
+}
+
+.back {
+    /* Ensure the "back side" is flipped already */
+    -webkit-transform: rotateX(180deg);
+}
+
+#done {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+input[type='submit'] {
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 13px;
+    text-shadow: rgba(0,0,0,0.5) 0px -1px 0px;
+    border: none;
+    padding: 5px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#797979), to(#434343), color-stop(0.5, #5e5e5e), color-stop(0.5, #505050));
+    -webkit-border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+
+input[type='submit']:hover {
+    background: -webkit-gradient(linear, left top, left bottom, from(#919191), to(#575757), color-stop(0.5, #747474), color-stop(0.5, #686868));
+}

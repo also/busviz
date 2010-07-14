@@ -1,10 +1,53 @@
 <html>
 <head>
 <title>a day on the bus</title>
-<script type="text/javascript" src="geo.js"></script>
-<script type="text/javascript" src="viz.js"></script>
-<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="js/geo.js"></script>
+<script type="text/javascript" src="js/presets.js"></script>
+<script type="text/javascript" src="js/viz.js"></script>
+<script type="text/javascript" src="lib/jquery-1.4.2.min.js"></script>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+<body>
+<div id="wrapper">
+<div id="viz">
+<div class="side front">
+<canvas id="canvas" width="1280" height="720"></canvas>
+<div id="video">
+<object width="1280" height="720"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=13141717&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=ffffff&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=13141717&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=ffffff&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="1280" height="720"></embed></object>
+</div>
+</div>
+<div class="side back">
+<div id="options">
+<h2>Options</h2>
+<h3>Presets</h3>
+<ul id="presets">
+<li id="base">Default</li>
+<li id="white">White</li>
+<li id="now">Now</li>
+<li id="cumulative">Cumulative</li>
+<li id="snake">Snake</li>
+<li id="blurry">Blurry</li>
+</ul>
+<input type="submit" value="Done" id="done"/>
+</div>
+</div>
+</div>
+</div>
+<div id="desc">
+<h1>A Day on the Bus</h1>
+
+<p>Visualizing one day of MBTA bus locations.</p>
+
+<p><a href="http://ryanberdeen.com/">Ryan Berdeen</a>, 2010.</p>
+</div>
 <script type="text/javascript">
+var lines;
+var player;
+function restart() {
+  player.stop();
+  player = new Player(lines);
+  player.start();
+}
 function load() {
   var interval;
   $.ajax({
@@ -13,9 +56,10 @@ function load() {
     success: function (data) {
       drawProgress(1);
       clearInterval(interval);
+      lines = data.split('\n');
+      player = new Player(lines);
       setTimeout(function () {
-        var lines = data.split('\n');
-        draw(lines);
+        player.start();
       }, 1000);
     },
     beforeSend: function (xhr) {
@@ -28,6 +72,26 @@ function load() {
       }, 200);
     }
   });
+
+  var flipped = false;
+  $(document).ready(function () {
+    $('.front').bind('click', function () {
+      $('#viz').addClass('flipped');
+    });
+    $('#done').bind('click', function () {
+      hideSettings();
+    });
+    $('#presets li').bind('click', function () {
+      settings = presets[this.id];
+      hideSettings();
+      restart();
+    })
+  });
+
+  function hideSettings() {
+    $('#viz').removeClass('flipped');
+  }
+  
 }
 
 function drawProgress(progress) {
@@ -53,22 +117,5 @@ function drawProgress(progress) {
 
 load();
 </script>
-<style type="text/css">
-body {
-    background: #000;
-    padding: 0;
-    margin: 0;
-}
-#wrapper {
-    margin: 30px auto;
-    width: 1280px;
-    border: 1px solid #111;
-}
-</style>
-</head>
-<body>
-<div id="wrapper">
-<canvas id="canvas" width="1280" height="720"></canvas>
-</div>
 </body>
 </html>

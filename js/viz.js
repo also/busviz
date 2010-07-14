@@ -1,32 +1,17 @@
 var MPH_TO_KPS = 0.00044704;
 
-var SPEED_GRAD_MIN = 10 * MPH_TO_KPS;
-var SPEED_GRAD_MAX = 50 * MPH_TO_KPS;
-
 // maximum speed and duration. values above are ignored
 var MAX_DURATION = 120;
 var MAX_SPEED = 100 * MPH_TO_KPS;
 
-// width of the bus trails
-var LINE_WIDTH = 1;
+var settings = presets['base'];
 
-// alpha of the bus trails
-var ALPHA = .1;
-
-// alpha of the generational fade
-var FADE_ALPHA = 0;
-
-// color of the bus trails. null for speed gradient
-var COLOR = null;
-
-var LINE_CAP = 'butt';
-
-var CLOCK_COLOR = '#aaaaaa';
-
-function draw(lines) {
+function Player(lines) {
+  var stopped = false;
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#000000';
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = settings.background_color;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   var min = [-71.3019033935547, 42.209136123873834];
@@ -37,13 +22,17 @@ function draw(lines) {
   var yScale = (canvas.height - 20) / latRange;
   var scale = Math.min(xScale, yScale);
 
+  this.stop = function stop() {
+    stopped = true;
+  }
+
   function drawLegend() {
     var max = 40;
     ctx.save();
     ctx.translate(20, 20)
 
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = settings.legend_color;
 
     for (var i = 0; i <= max; i += 10) {
       ctx.fillText(i + ' MPH', 10, 200 / max * i);
@@ -60,7 +49,7 @@ function draw(lines) {
     ctx.restore();
   }
 
-  if (!COLOR) {
+  if (!settings.color && settings.show_legend) {
     drawLegend();
   }
 
@@ -72,8 +61,8 @@ function draw(lines) {
     var hr  = date.getHours() % 12;
 
     ctx.globalAlpha = 1;
-    ctx.fillStyle = '#000000';
-    ctx.strokeStyle = CLOCK_COLOR;
+    ctx.fillStyle = settings.background_color;
+    ctx.strokeStyle = settings.clock_color;
     ctx.lineCap = "round";
     ctx.lineWidth = 2;
 
@@ -125,10 +114,10 @@ function draw(lines) {
   }
 
   function colorForSpeed(speed) {
-    if (COLOR) {
-      return COLOR;
+    if (settings.color) {
+      return settings.color;
     }
-    var linearPosition = Math.min(Math.max((speed - SPEED_GRAD_MIN), 0) / (SPEED_GRAD_MAX - SPEED_GRAD_MIN), 1);
+    var linearPosition = Math.min(Math.max((speed - settings.speed_gradient_min), 0) / (settings.speed_gradient_max - settings.speed_gradient_min), 1);
     var gradientPosition = Math.sqrt(linearPosition);
 
     var red = toHex(255 - gradientPosition * 255);
@@ -151,9 +140,9 @@ function draw(lines) {
       }
 
       ctx.strokeStyle = colorForSpeed(speed);
-      ctx.globalAlpha = ALPHA;
-      ctx.lineWidth = LINE_WIDTH;
-      ctx.lineCap = LINE_CAP;
+      ctx.globalAlpha = settings.alpha;
+      ctx.lineWidth = settings.line_width;
+      ctx.lineCap = settings.line_cap;
 
       ctx.beginPath();
       ctx.moveTo((previous.lon - min[0]) * scale, canvas.height - Mercator.lat2y(previous.lat - min[1]) * scale);
@@ -170,14 +159,15 @@ function draw(lines) {
   var i = 0;
 
   function advance() {
-    while (i < lines.length) {
+    if (settings.fade_alpha > 0) {
+      ctx.fillStyle = settings.background_color;
+      ctx.globalAlpha = settings.fade_alpha;
+      ctx.fillRect(0,0,canvas.width, canvas.height);
+    }
+    while (i < lines.length && !stopped) {
       var current = parseLine(lines[i]);
       if (current.timeOffset != 0 && i != groupFirstIndex) {
-        if (FADE_ALPHA > 0) {
-          ctx.fillStyle = '#000';
-          ctx.globalAlpha = FADE_ALPHA;
-          ctx.fillRect(0,0,canvas.width, canvas.height);
-        }
+        
         groupFirstIndex = i;
         setTimeout(advance, 1);
         currentTimestamp += current.timeOffset;
@@ -192,5 +182,8 @@ function draw(lines) {
     }
   }
 
-  advance();
+  this.start = function start() {
+    stopped = false;
+    advance();
+  };
 }
