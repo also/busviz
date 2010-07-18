@@ -6,7 +6,24 @@ var MAX_SPEED = 100 * MPH_TO_KPS;
 
 var settings = {};
 
-function Player(lines) {
+function LineIterator(data) {
+  var offset = 0;
+  this.hasNext = function hasNext() {
+    return offset < data.length;
+  };
+  this.next = function next() {
+    var end = data.indexOf('\n', offset);
+    if (end == -1) {
+      end == data.length;
+    }
+    var result = data.substring(offset, end);
+    offset = end + 1;
+    return result;
+  };
+}
+
+function Player(data) {
+  var iterator = new LineIterator(data);
   var stopped = false;
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
@@ -96,7 +113,7 @@ function Player(lines) {
   }
 
   function parseLine(line) {
-    var row = lines[i].split(',');
+    var row = line.split(',');
     var timeOffset = Number(row[0] || 0);
     var vehicleId = row[1];
     var route = row[2] || null;
@@ -154,31 +171,37 @@ function Player(lines) {
   var buses = {};
 
   var currentTimestamp = 0;
-  var groupFirstIndex = -1;
-
-  var i = 0;
+  var firstRowInFrame = false;
+  var current;
 
   function advance() {
+    if (stopped) {
+      return;
+    }
+
     if (settings.fade_alpha > 0) {
       ctx.fillStyle = settings.background_color;
       ctx.globalAlpha = settings.fade_alpha;
       ctx.fillRect(0,0,canvas.width, canvas.height);
     }
-    while (i < lines.length && !stopped) {
-      var current = parseLine(lines[i]);
-      if (current.timeOffset != 0 && i != groupFirstIndex) {
-        
-        groupFirstIndex = i;
-        setTimeout(advance, 1);
-        currentTimestamp += current.timeOffset;
-        drawClock(new Date(currentTimestamp * 1000));
-        return;
+
+    while (firstRowInFrame || iterator.hasNext()) {
+      if (!firstRowInFrame) {
+        current = parseLine(iterator.next());
+        if (current.timeOffset != 0) {
+          firstRowInFrame = true;
+          setTimeout(advance, 1);
+          currentTimestamp += current.timeOffset;
+          drawClock(new Date(currentTimestamp * 1000));
+          return;
+        }
       }
+      firstRowInFrame = false;
+      // draw the current row
       current.timestamp = currentTimestamp;
       var previous = buses[current.vehicleId];
       drawBus(current, previous);
       buses[current.vehicleId] = current;
-      i++;
     }
   }
 

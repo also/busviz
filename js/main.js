@@ -1,9 +1,9 @@
-var lines;
+var data;
 var player;
 var settingsChanged = false;
 function restart() {
   player.stop();
-  player = new Player(lines);
+  player = new Player(data);
   player.start();
 }
 
@@ -25,10 +25,10 @@ function load() {
     type: 'GET',
     url: '15th.csv',
     success: function (data) {
+      window.data = data;
       drawProgress(1);
       clearInterval(interval);
-      lines = data.split('\n');
-      player = new Player(lines);
+      player = new Player(data);
       setTimeout(function () {
         player.start();
       }, 1000);
