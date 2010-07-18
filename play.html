@@ -19,6 +19,7 @@
 <div class="side back">
 <div id="options">
 <h2>Options</h2>
+<div class="block">
 <h3>Presets</h3>
 <ul id="presets">
 <li id="base">Default</li>
@@ -28,6 +29,21 @@
 <li id="snake">Snake</li>
 <li id="blurry">Blurry</li>
 </ul>
+</div>
+<div class="block">
+<h3>Lines</h3>
+<p><label>Color</label><input type="text" id="settings_color"/></p>
+<p><label>Alpha</label><input type="text" id="settings_alpha"/></p>
+<p><label>Width</label><input type="text" id="settings_line_width"/></p>
+<p><label>Cap</label><select id="settings_line_cap"><option>butt</option><option>round</option><option>square</option></select></p>
+</div>
+<div class="block">
+<h3>More</h3>
+<p><label>Fade Alpha</label><input type="text" id="settings_fade_alpha"/></p>
+<p><label>Clock Color</label><input type="text" id="settings_clock_color"/></p>
+<p><label>Background Color</label><input type="text" id="settings_background_color"/></p>
+<p><label>Legend Color</label><input type="text" id="settings_legend_color"/></p>
+</div>
 <input type="submit" value="Done" id="done"/>
 </div>
 </div>
@@ -40,82 +56,6 @@
 
 <p><a href="http://ryanberdeen.com/">Ryan Berdeen</a>, 2010.</p>
 </div>
-<script type="text/javascript">
-var lines;
-var player;
-function restart() {
-  player.stop();
-  player = new Player(lines);
-  player.start();
-}
-function load() {
-  var interval;
-  $.ajax({
-    type: 'GET',
-    url: '15th.csv',
-    success: function (data) {
-      drawProgress(1);
-      clearInterval(interval);
-      lines = data.split('\n');
-      player = new Player(lines);
-      setTimeout(function () {
-        player.start();
-      }, 1000);
-    },
-    beforeSend: function (xhr) {
-      interval = setInterval(function () {
-        if (xhr.readyState > 2) {
-          var totalBytes = xhr.getResponseHeader('Content-length');
-          var dlBytes = xhr.responseText.length;
-          drawProgress(dlBytes / totalBytes);
-        }
-      }, 200);
-    }
-  });
-
-  var flipped = false;
-  $(document).ready(function () {
-    $('.front').bind('click', function () {
-      $('#viz').addClass('flipped');
-    });
-    $('#done').bind('click', function () {
-      hideSettings();
-    });
-    $('#presets li').bind('click', function () {
-      settings = presets[this.id];
-      hideSettings();
-      restart();
-    })
-  });
-
-  function hideSettings() {
-    $('#viz').removeClass('flipped');
-  }
-  
-}
-
-function drawProgress(progress) {
-  var canvas = $('#canvas').get(0);
-  var ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.translate(canvas.width - 50, 50);
-  ctx.rotate(3 * Math.PI / 2);
-  ctx.strokeStyle = '#aaa';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  if (progress != 1) {
-    ctx.moveTo(0, 0);
-  }
-  ctx.arc(0, 0, 25, 0, Math.PI * 2 * progress, false);
-  if (progress != 1) {
-    ctx.lineTo(0, 0);
-  }
-  ctx.stroke();
-  ctx.restore();
-}
-
-load();
-</script>
+<script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>

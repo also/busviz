@@ -4,7 +4,7 @@ var MPH_TO_KPS = 0.00044704;
 var MAX_DURATION = 120;
 var MAX_SPEED = 100 * MPH_TO_KPS;
 
-var settings = presets['base'];
+var settings = {};
 
 function Player(lines) {
   var stopped = false;
