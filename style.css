@@ -22,7 +22,7 @@ body {
     -webkit-transition-duration: 0.5s;
 }
 
-#viz.flipped {
+.enable3d #viz.flipped {
     -webkit-transform: rotateX(180deg);
 }
 
@@ -40,6 +40,14 @@ body {
 }
 
 .back {
+    display: none;
+}
+
+.flipped .back, .enable3d .back {
+    display: block;
+}
+
+.enable3d .back {
     -webkit-transform: rotateX(180deg);
 }
 

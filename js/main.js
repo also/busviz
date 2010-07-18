@@ -9,11 +9,17 @@ function restart() {
 
 function load() {
   updateSettings(presets.base);
+  // FIXME
+  if (navigator.userAgent.indexOf('Version/5.') != -1) {
+    $('body').addClass('enable3d');
+  }
+
   $('input, select').bind('change', function () {
     var setting = this.id.substring(9);
     settings[setting] = $(this).val();
     settingsChanged = true;
   });
+
   var interval;
   $.ajax({
     type: 'GET',
